@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<contentHaul xmlns:a="http://www.appian.com/ae/types/2009">
+    <rule>
+        <name>FM_TestCase</name>
+        <uuid>_a-0000dfed-a419-8000-3120-01ef9001ef90_19164</uuid>
+        <description>This creates release status based on build statuses</description>
+        <parentUuid>_a-0000dfed-a419-8000-3120-01ef9001ef90_19163</parentUuid>
+        <visibility>
+            <advertise>false</advertise>
+            <hierarchy>true</hierarchy>
+            <indexable>true</indexable>
+            <quota>false</quota>
+            <searchable>true</searchable>
+            <system>false</system>
+            <unlogged>false</unlogged>
+        </visibility>
+        <definition>/*
+Statuses from iACD_MILESTONES_STATUS table
+1-Created
+2-In progress
+3-Completed
+4-Failed
+5-Scheduled
+6-Attention Required
+7-Closed
+*/
+load(
+  local!unionValue: union(
+    ri!buildStatuses,
+    ri!buildStatuses
+  ),
+  if(
+    or(
+      contains(ri!buildStatuses,4),
+      contains(ri!buildStatuses,6)
+    ),
+    6,
+    if(
+      or(
+        contains(ri!buildStatuses,2),
+        contains(ri!buildStatuses,5)
+      ),
+      2,
+      if(
+        length(local!unionValue = 1),
+        {
+          if( or(
+            contains(ri!buildStatuses,5),
+             contains(ri!buildStatuses,3)
+            ),
+            2,
+            local!unionValue
+          )
+        },
+        mode(ri!buildStatuses)
+      )
+    )
+  )
+)</definition>
+        <namedTypedValue>
+            <name>buildStatuses</name>
+            <type>
+                <name>Integer?list</name>
+                <namespace>http://www.appian.com/ae/types/2009</namespace>
+            </type>
+        </namedTypedValue>
+        <preferredEditor>legacy</preferredEditor>
+        <offlineEnabled>false</offlineEnabled>
+    </rule>
+    <roleMap public="true">
+        <role inherit="true" allowForAll="false" name="readers">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="true" allowForAll="false" name="authors">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="true" allowForAll="false" name="administrators">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="false" allowForAll="false" name="denyReaders">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="false" allowForAll="false" name="denyAuthors">
+            <users/>
+            <groups/>
+        </role>
+        <role inherit="false" allowForAll="false" name="denyAdministrators">
+            <users/>
+            <groups/>
+        </role>
+    </roleMap>
+    <typedValue>
+        <type>
+            <name>RuleTestConfig?list</name>
+            <namespace>http://www.appian.com/ae/types/2009</namespace>
+        </type>
+        <value>
+            <el>
+                <a:name>Any one build status -failed or attention required --Attention required</a:name>
+                <a:ruleInputTestConfigs>
+                    <a:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="a:Expression">{3,4,5,5}</a:value>
+                    <a:nameRef>buildStatuses</a:nameRef>
+                    <a:id>1</a:id>
+                </a:ruleInputTestConfigs>
+                <a:assertions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            </el>
+            <el>
+                <a:name>Any one build status- In progress or scheduled-- In progress</a:name>
+                <a:ruleInputTestConfigs>
+                    <a:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="a:Expression">{2,3,5}</a:value>
+                    <a:nameRef>buildStatuses</a:nameRef>
+                    <a:id>1</a:id>
+                </a:ruleInputTestConfigs>
+                <a:assertions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            </el>
+            <el>
+                <a:name>All statuses are same-&amp; it is Scheduled -- In progress</a:name>
+                <a:ruleInputTestConfigs>
+                    <a:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="a:Expression">{5,5,5}</a:value>
+                    <a:nameRef>buildStatuses</a:nameRef>
+                    <a:id>1</a:id>
+                </a:ruleInputTestConfigs>
+                <a:assertions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            </el>
+            <el>
+                <a:name>All statuses are same - same status</a:name>
+                <a:ruleInputTestConfigs>
+                    <a:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="a:Expression">{3,3,3,3}</a:value>
+                    <a:nameRef>buildStatuses</a:nameRef>
+                    <a:id>1</a:id>
+                </a:ruleInputTestConfigs>
+                <a:assertions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            </el>
+        </value>
+    </typedValue>
+</contentHaul>
